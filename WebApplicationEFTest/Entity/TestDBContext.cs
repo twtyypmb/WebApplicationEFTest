@@ -35,21 +35,8 @@ namespace WebApplicationEFTest.Entity
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Fun(this);
-            
-
-            modelBuilder.Entity<UserRole>(entity => 
-            {
-                entity.HasOne(p => p.User)
-                .WithMany(p => p.UserRoles)
-                .HasForeignKey(p => p.UserId)
-                .HasConstraintName("ForeignKey_UserRole_User");
-
-                entity.HasOne(p => p.Role)
-                .WithMany(p => p.UserRoles)
-                .HasForeignKey(p => p.RoleId)
-                .HasConstraintName("ForeignKey_UserRole_Role");
-            });
+            modelBuilder.GenerateUnderScoreCaseColumn(this);
+            modelBuilder.GenerateForeignKey(this);
 
 
             base.OnModelCreating(modelBuilder);

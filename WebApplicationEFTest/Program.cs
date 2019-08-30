@@ -15,13 +15,14 @@ namespace WebApplicationEFTest
     {
         public static void Main(string[] args)
         {
-            //var sdf= Extension.CamelCaseToUnderScoreCase("ScoreCaseFdsfds");
-            //var sd= Extension.UnderScoreCaseToCamelCase(sdf);
+            
 
-            var builder = new ModelBuilder(new Microsoft.EntityFrameworkCore.Metadata.Conventions.ConventionSet());
-            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
+            //var builder = new ModelBuilder(new Microsoft.EntityFrameworkCore.Metadata.Conventions.ConventionSet());
+            //DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
 
-            builder.Fun(new Entity.TestDBContext(optionsBuilder.UseSqlServer("Server=.;Database=WebApplicationEFTest;Trusted_Connection=True;").Options));
+            //builder.GenerateForeignKey(new Entity.TestDBContext(optionsBuilder.UseSqlServer("Server=.;Database=WebApplicationEFTest;Trusted_Connection=True;").Options));
+
+
             CreateWebHostBuilder(args).Build().Run();
         }
 
