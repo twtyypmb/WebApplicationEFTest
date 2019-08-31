@@ -15,7 +15,7 @@ namespace WebApplicationEFTest
     {
         public static void Main(string[] args)
         {
-            
+
 
             //var builder = new ModelBuilder(new Microsoft.EntityFrameworkCore.Metadata.Conventions.ConventionSet());
             //DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();

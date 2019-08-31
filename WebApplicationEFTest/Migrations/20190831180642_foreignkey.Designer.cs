@@ -9,8 +9,8 @@ using WebApplicationEFTest.Entity;
 namespace WebApplicationEFTest.Migrations
 {
     [DbContext(typeof(TestDBContext))]
-    [Migration("20190829055553_auto_colume")]
-    partial class auto_colume
+    [Migration("20190831180642_foreignkey")]
+    partial class foreignkey
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -63,14 +63,19 @@ namespace WebApplicationEFTest.Migrations
                     b.Property<string>("RoleId")
                         .HasColumnName("role_id");
 
-                    b.Property<string>("UserId")
-                        .HasColumnName("user_id");
+                    b.Property<string>("UserId1")
+                        .HasColumnName("user_id1");
+
+                    b.Property<string>("UserId2")
+                        .HasColumnName("user_id2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId1");
+
+                    b.HasIndex("UserId2");
 
                     b.ToTable("UserRole");
                 });
@@ -82,10 +87,15 @@ namespace WebApplicationEFTest.Migrations
                         .HasForeignKey("RoleId")
                         .HasConstraintName("ForeignKey_UserRole_Role");
 
-                    b.HasOne("WebApplicationEFTest.Entity.User", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("ForeignKey_UserRole_User");
+                    b.HasOne("WebApplicationEFTest.Entity.User", "User1")
+                        .WithMany("UserRoles1")
+                        .HasForeignKey("UserId1")
+                        .HasConstraintName("ForeignKey_UserRole_User1");
+
+                    b.HasOne("WebApplicationEFTest.Entity.User", "User2")
+                        .WithMany("UserRoles2")
+                        .HasForeignKey("UserId2")
+                        .HasConstraintName("ForeignKey_UserRole_User2");
                 });
 #pragma warning restore 612, 618
         }

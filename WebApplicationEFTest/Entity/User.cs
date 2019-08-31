@@ -15,7 +15,8 @@ namespace WebApplicationEFTest.Entity
 
         public double Age { get; set; }
 
-        public virtual IList<UserRole> UserRoles { get; set; }
+        public virtual IList<UserRole> UserRoles1 { get; set; }
+        public virtual IList<UserRole> UserRoles2 { get; set; }
 
     }
 }

@@ -42,7 +42,14 @@ namespace WebApplicationEFTest.Controller
             {
                 Id = Guid.NewGuid().ToString(),
                 Role = role,
-                User = user
+                User1 = user,
+                User2 = new Entity.User()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Age = 0.2,
+                    Name = "里da斯",
+                    Sex = 1
+                }
             };
 
             context.Set<Entity.UserRole>().Add(user_role);

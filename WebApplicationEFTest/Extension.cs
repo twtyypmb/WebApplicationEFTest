@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 namespace WebApplicationEFTest
@@ -36,7 +37,7 @@ namespace WebApplicationEFTest
             }
         }
 
-        public static void GenerateForeignKey(this ModelBuilder modelBuilder, DbContext context)
+        public static void GenerateForeignKey(this ModelBuilder model_builder, DbContext context)
         {
             var props = context.GetType().GetProperties().Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(Microsoft.EntityFrameworkCore.DbSet<>));
 
@@ -67,21 +68,21 @@ namespace WebApplicationEFTest
                                 m = regex.Match(list_item_pro.Name);
                                 if ((m.Success ? m.Value : string.Empty) == variable_num)
                                 {
-                                    modelBuilder.Entity(dbset_type.Name)
-                                        .HasOne(item.Name)
+                                    model_builder.Entity(dbset_type)
+                                        .HasOne(virtual_type,item.Name)
                                         .WithMany(list_item_pro.Name)
-                                        .HasForeignKey($"{item.Name}Id{variable_num}")
-                                        .HasConstraintName($"ForeignKey_{dbset_type.Name}_{item.Name}{variable_num}");
+                                        .HasForeignKey($"{virtual_type.Name}Id{variable_num}")
+                                        .HasConstraintName($"ForeignKey_{dbset_type.Name}_{virtual_type.Name}{variable_num}");
                                     break;
                                 }
                             }
 
 
-                            //modelBuilder.Entity("UserRole")
-                            //    .HasOne("User")
-                            //    .WithMany("UserRoles")
-                            //    .HasForeignKey("UserId")
-                            //    .HasConstraintName("ForeignKey_UserRole_User");
+                            //model_builder.Entity(typeof(UserRole))
+                            //.HasOne(typeof(User),"User") //不能用string，只能用type https://stackoverflow.com/questions/50366754/entity-type-microsoft-aspnetcore-identity-identityrole-is-in-shadow-state
+                            //.WithMany("UserRoles")
+                            //.HasForeignKey("UserId")
+                            //.HasConstraintName("ForeignKey_UserRole_User");
                         }
                         else
                         {
@@ -92,6 +93,7 @@ namespace WebApplicationEFTest
                 }
             }
         }
+
 
         public static string CamelCaseToUnderScoreCase(string s)
         {
