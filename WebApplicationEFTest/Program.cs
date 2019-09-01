@@ -17,10 +17,10 @@ namespace WebApplicationEFTest
         {
 
 
-            //var builder = new ModelBuilder(new Microsoft.EntityFrameworkCore.Metadata.Conventions.ConventionSet());
-            //DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
+            var builder = new ModelBuilder(new Microsoft.EntityFrameworkCore.Metadata.Conventions.ConventionSet());
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
 
-            //builder.GenerateForeignKey(new Entity.TestDBContext(optionsBuilder.UseSqlServer("Server=.;Database=WebApplicationEFTest;Trusted_Connection=True;").Options));
+            builder.GenerateForeignKey(new Entity.TestDBContext(optionsBuilder.UseSqlServer("Server=.;Database=WebApplicationEFTest;Trusted_Connection=True;").Options));
 
 
             CreateWebHostBuilder(args).Build().Run();

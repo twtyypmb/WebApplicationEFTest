@@ -2,7 +2,7 @@
 
 namespace WebApplicationEFTest.Migrations
 {
-    public partial class foreignkey : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -37,28 +37,28 @@ namespace WebApplicationEFTest.Migrations
                 columns: table => new
                 {
                     id = table.Column<string>(nullable: false),
-                    user_id1 = table.Column<string>(nullable: true),
-                    user_id2 = table.Column<string>(nullable: true),
+                    user_id_current = table.Column<string>(nullable: true),
+                    user_id_parent = table.Column<string>(nullable: true),
                     role_id = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserRole", x => x.id);
                     table.ForeignKey(
-                        name: "ForeignKey_UserRole_Role",
+                        name: "ForeignKey_UserRole_Role_Role",
                         column: x => x.role_id,
                         principalTable: "Role",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "ForeignKey_UserRole_User1",
-                        column: x => x.user_id1,
+                        name: "ForeignKey_UserRole_User_UserCurrent",
+                        column: x => x.user_id_current,
                         principalTable: "User",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "ForeignKey_UserRole_User2",
-                        column: x => x.user_id2,
+                        name: "ForeignKey_UserRole_User_UserParent",
+                        column: x => x.user_id_parent,
                         principalTable: "User",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -70,14 +70,14 @@ namespace WebApplicationEFTest.Migrations
                 column: "role_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRole_user_id1",
+                name: "IX_UserRole_user_id_current",
                 table: "UserRole",
-                column: "user_id1");
+                column: "user_id_current");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRole_user_id2",
+                name: "IX_UserRole_user_id_parent",
                 table: "UserRole",
-                column: "user_id2");
+                column: "user_id_parent");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

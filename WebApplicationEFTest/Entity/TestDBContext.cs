@@ -33,6 +33,16 @@ namespace WebApplicationEFTest.Entity
         /// </summary>
         public virtual DbSet<UserRole> UserRole { get; set; }
 
+        /// <summary>
+        /// 映射用户信息表
+        /// </summary>
+        public virtual DbSet<OperateLog> OperateLog { get; set; }
+
+        /// <summary>
+        /// 映射用户信息表
+        /// </summary>
+        public virtual DbSet<LoginLog> LoginLog { get; set; }
+
         protected override void OnModelCreating(ModelBuilder model_builder)
         {
             model_builder.GenerateUnderScoreCaseColumn(this);

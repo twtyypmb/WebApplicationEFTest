@@ -41,15 +41,15 @@ namespace WebApplicationEFTest.Controller
             var user_role = new Entity.UserRole()
             {
                 Id = Guid.NewGuid().ToString(),
-                Role = role,
-                User1 = user,
-                User2 = new Entity.User()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Age = 0.2,
-                    Name = "里da斯",
-                    Sex = 1
-                }
+                //Role = role,
+                //UserCurrent = user,
+                //UserParent = new Entity.User()
+                //{
+                //    Id = Guid.NewGuid().ToString(),
+                //    Age = 0.2,
+                //    Name = "里da斯",
+                //    Sex = 1
+                //}
             };
 
             context.Set<Entity.UserRole>().Add(user_role);

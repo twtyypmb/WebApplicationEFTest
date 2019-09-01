@@ -9,8 +9,8 @@ using WebApplicationEFTest.Entity;
 namespace WebApplicationEFTest.Migrations
 {
     [DbContext(typeof(TestDBContext))]
-    [Migration("20190831180642_foreignkey")]
-    partial class foreignkey
+    [Migration("20190901162022_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -63,19 +63,19 @@ namespace WebApplicationEFTest.Migrations
                     b.Property<string>("RoleId")
                         .HasColumnName("role_id");
 
-                    b.Property<string>("UserId1")
-                        .HasColumnName("user_id1");
+                    b.Property<string>("UserIdCurrent")
+                        .HasColumnName("user_id_current");
 
-                    b.Property<string>("UserId2")
-                        .HasColumnName("user_id2");
+                    b.Property<string>("UserIdParent")
+                        .HasColumnName("user_id_parent");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserIdCurrent");
 
-                    b.HasIndex("UserId2");
+                    b.HasIndex("UserIdParent");
 
                     b.ToTable("UserRole");
                 });
@@ -85,17 +85,17 @@ namespace WebApplicationEFTest.Migrations
                     b.HasOne("WebApplicationEFTest.Entity.Role", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
-                        .HasConstraintName("ForeignKey_UserRole_Role");
+                        .HasConstraintName("ForeignKey_UserRole_Role_Role");
 
-                    b.HasOne("WebApplicationEFTest.Entity.User", "User1")
-                        .WithMany("UserRoles1")
-                        .HasForeignKey("UserId1")
-                        .HasConstraintName("ForeignKey_UserRole_User1");
+                    b.HasOne("WebApplicationEFTest.Entity.User", "UserCurrent")
+                        .WithMany("UserRolesCurrent")
+                        .HasForeignKey("UserIdCurrent")
+                        .HasConstraintName("ForeignKey_UserRole_User_UserCurrent");
 
-                    b.HasOne("WebApplicationEFTest.Entity.User", "User2")
-                        .WithMany("UserRoles2")
-                        .HasForeignKey("UserId2")
-                        .HasConstraintName("ForeignKey_UserRole_User2");
+                    b.HasOne("WebApplicationEFTest.Entity.User", "UserParent")
+                        .WithMany("UserRolesParent")
+                        .HasForeignKey("UserIdParent")
+                        .HasConstraintName("ForeignKey_UserRole_User_UserParent");
                 });
 #pragma warning restore 612, 618
         }

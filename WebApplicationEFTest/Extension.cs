@@ -37,14 +37,18 @@ namespace WebApplicationEFTest
             }
         }
 
-        public static void GenerateForeignKey(this ModelBuilder model_builder, DbContext context)
+        public static void GenerateForeignKey(this ModelBuilder model_builder, DbContext context, string foreign_key_suffix = "Id", Type[] except_dbset_types = null)
         {
-            var props = context.GetType().GetProperties().Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(Microsoft.EntityFrameworkCore.DbSet<>));
+            // 找到上下文中定义的deset泛型类，且泛型类不在指定的例外之内
+            var props = context.GetType().GetProperties().Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(Microsoft.EntityFrameworkCore.DbSet<>) );
 
             // 循环context中的dbset泛型属性
             foreach (var p in props)
             {
-
+                if (except_dbset_types!=null && except_dbset_types.Contains(p.PropertyType))
+                {
+                    continue;
+                }
 
                 if (p.PropertyType?.GenericTypeArguments?.Length > 0)
                 {
@@ -52,29 +56,37 @@ namespace WebApplicationEFTest
                     var dbset_type = p.PropertyType.GenericTypeArguments[0];
                     foreach (var item in dbset_type.GetProperties())
                     {
-
                         // 找到其中virtual的属性,且不是列表IEnumerable<>类型的属性
                         if (item.GetAccessors().Where(a => a.IsVirtual).Count() > 0 && !(item.PropertyType.IsGenericType && typeof(IEnumerable<int>).IsAssignableFrom(item.PropertyType.GetGenericTypeDefinition().MakeGenericType(typeof(int)))))
                         {
                             // 属性对应的类型，就是这个外键对应的类
                             var virtual_type = item.PropertyType;
-                            Regex regex = new Regex(@"\d+");
-                            var m= regex.Match(item.Name);
-                            string variable_num = m.Success ? m.Value : string.Empty;
+
+                            // 先找到名称的后缀，以后缀区分多个外键
+                            Regex regex = new Regex($@"(?<={virtual_type.Name})\w+");
+                            var m = regex.Match(item.Name);
+                            string suffix = m.Success ? m.Value : string.Empty;
                             // 找到主键类型中对应的外键的列表类型的属性
                             var list_property = virtual_type.GetProperties().Where(q => q.PropertyType.IsGenericType && typeof(IEnumerable<int>).IsAssignableFrom(q.PropertyType.GetGenericTypeDefinition().MakeGenericType(typeof(int))) && q.PropertyType?.GenericTypeArguments[0] == dbset_type);
                             foreach (var list_item_pro in list_property)
                             {
-                                m = regex.Match(list_item_pro.Name);
-                                if ((m.Success ? m.Value : string.Empty) == variable_num)
+                                
+                                // 后缀为空或者后缀相同，则说明是同一个外键
+                                if (suffix != string.Empty )
                                 {
-                                    model_builder.Entity(dbset_type)
-                                        .HasOne(virtual_type,item.Name)
-                                        .WithMany(list_item_pro.Name)
-                                        .HasForeignKey($"{virtual_type.Name}Id{variable_num}")
-                                        .HasConstraintName($"ForeignKey_{dbset_type.Name}_{virtual_type.Name}{variable_num}");
-                                    break;
+                                    var index = list_item_pro.Name.IndexOf(suffix);
+                                    // 如果不为空，则需要和当前dbset类中的外键后缀相同
+                                    if (index < 0 || list_item_pro.Name.Substring(index) != suffix)
+                                    {
+                                        continue;
+                                    }
+                                    
                                 }
+                                model_builder.Entity(dbset_type)
+                                       .HasOne(virtual_type, item.Name)
+                                       .WithMany(list_item_pro.Name)
+                                       .HasForeignKey($"{virtual_type.Name}{foreign_key_suffix}{suffix}")
+                                       .HasConstraintName($"ForeignKey_{dbset_type.Name}_{virtual_type.Name}_{item.Name}");
                             }
 
 
