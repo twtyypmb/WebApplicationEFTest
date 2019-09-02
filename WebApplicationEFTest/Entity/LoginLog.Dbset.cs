@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace WebApplicationEFTest.Entity
 {
-    public partial class OperateLog : BaseEntity
+    public partial class LoginLog
     {
-
-        public string UserId1 { get; set; }
-        public string UserId2 { get; set; }
-
+        public virtual User User
+        {
+            get; set;
+        }
     }
 }

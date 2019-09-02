@@ -43,6 +43,11 @@ namespace WebApplicationEFTest.Entity
         /// </summary>
         public virtual DbSet<LoginLog> LoginLog { get; set; }
 
+        public virtual DbSet<UserExtraInfo> UserExtraInfo
+        {
+            get; set;
+        }
+
         protected override void OnModelCreating(ModelBuilder model_builder)
         {
             model_builder.GenerateUnderScoreCaseColumn(this);
