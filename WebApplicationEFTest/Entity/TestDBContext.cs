@@ -51,7 +51,7 @@ namespace WebApplicationEFTest.Entity
         protected override void OnModelCreating(ModelBuilder model_builder)
         {
             model_builder.GenerateUnderScoreCaseColumn(this);
-            model_builder.GenerateForeignKey(this);
+            //model_builder.GenerateForeignKey(this);
 
             //model_builder.Entity<UserRole>()
             //    .HasOne(p => p.User1)

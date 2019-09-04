@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplicationEFTest.Entity;
 
 namespace WebApplicationEFTest.Migrations
 {
     [DbContext(typeof(TestDBContext))]
-    partial class TestDBContextModelSnapshot : ModelSnapshot
+    [Migration("20190904021945_foreignkey-attr")]
+    partial class foreignkeyattr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

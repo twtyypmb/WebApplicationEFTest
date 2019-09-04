@@ -11,5 +11,7 @@ namespace WebApplicationEFTest.Entity
         {
             get; set;
         }
+
+        public string Address { get; set; }
     }
 }
