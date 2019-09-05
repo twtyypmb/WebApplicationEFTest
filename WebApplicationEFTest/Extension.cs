@@ -1,14 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace WebApplicationEFTest
 {
     public static class Extension
     {
+        public const string annotation = "MS_Description";
         public static bool IsSimpleType( this Type t )
         {
             return t.IsPrimitive || t == typeof( string );
@@ -35,6 +39,7 @@ namespace WebApplicationEFTest
                         else
                         {
                             modelBuilder.Entity(p.PropertyType.GenericTypeArguments[0]).Property(item.Name).HasColumnName(CamelCaseToUnderScoreCase(item.Name));
+
                         }
                     }
                     //modelBuilder.Entity(p.PropertyType.GenericTypeArguments[0]).Property(item.Name).HasColumnName(CamelCaseToUnderScoreCase(item.Name));
@@ -164,5 +169,201 @@ namespace WebApplicationEFTest
             }
             
         }
+
+        public static ModelBuilder ConfigDatabaseDescription(this ModelBuilder modelBuilder)
+        {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                //添加表说明
+                if (entityType.FindAnnotation(annotation) == null && entityType.ClrType?.CustomAttributes.Any(
+                        attr => attr.AttributeType == typeof(DescriptionAttribute)) == true)
+                {
+                    entityType.AddAnnotation(annotation,
+                        (entityType.ClrType.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute
+                        )?.Description);
+                }
+
+                //添加列说明
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.FindAnnotation(annotation) == null && property.PropertyInfo?.CustomAttributes
+                            .Any(attr => attr.AttributeType == typeof(DescriptionAttribute)) == true)
+                    {
+                        var propertyInfo = property.PropertyInfo;
+                        var propertyType = propertyInfo?.PropertyType;
+                        //如果该列的实体属性是枚举类型，把枚举的说明追加到列说明
+                        var enumDbDescription = string.Empty;
+                        if (propertyType.IsEnum
+                            || (propertyType.IsDerivedFrom(typeof(Nullable<>)) && propertyType.GenericTypeArguments[0].IsEnum))
+                        {
+                            var @enum = propertyType.IsDerivedFrom(typeof(Nullable<>))
+                                ? propertyType.GenericTypeArguments[0]
+                                : propertyType;
+
+                            var descList = new List<string>();
+                            foreach (var field in @enum?.GetFields() ?? new FieldInfo[0])
+                            {
+                                if (!field.IsSpecialName)
+                                {
+                                    var desc = (field.GetCustomAttributes(typeof(DescriptionAttribute), false)
+                                        .FirstOrDefault() as DescriptionAttribute)?.Description;
+                                    descList.Add(
+                                        $@"{field.GetRawConstantValue()} : {(desc.IsNullOrWhiteSpace() ? field.Name : desc)}");
+                                }
+                            }
+
+                            var isFlags = @enum?.GetCustomAttribute(typeof(FlagsAttribute)) != null;
+                            var enumTypeDbDescription =
+                                (@enum?.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as
+                                    DescriptionAttribute)?.Description;
+                            enumTypeDbDescription += enumDbDescription + (isFlags ? " [是标志位枚举]" : string.Empty);
+                            enumDbDescription =
+                                $@"( {(enumTypeDbDescription.IsNullOrWhiteSpace() ? "" : $@"{enumTypeDbDescription}; ")}{string.Join("; ", descList)} )";
+                        }
+
+                        property.AddAnnotation(annotation,
+                            $@"{(propertyInfo.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)
+                                ?.Description}{(enumDbDescription.IsNullOrWhiteSpace() ? "" : $@" {enumDbDescription}")}");
+                    }
+                }
+            }
+
+            return modelBuilder;
+        }
+
+        public static MigrationBuilder ApplyDatabaseDescription(this MigrationBuilder migrationBuilder, Migration migration)
+        {
+            var defaultSchema = "dbo";
+            var descriptionAnnotationName = annotation;
+
+            foreach (var entityType in migration.TargetModel.GetEntityTypes())
+            {
+                //添加表说明
+                var tableName = entityType.Relational().TableName;
+                var schema = entityType.Relational().Schema;
+                var tableDescriptionAnnotation = entityType.FindAnnotation(descriptionAnnotationName);
+
+                if (tableDescriptionAnnotation != null)
+                {
+                    migrationBuilder.AddOrUpdateTableDescription(
+                        tableName,
+                        tableDescriptionAnnotation.Value.ToString(),
+                        schema.IsNullOrEmpty() ? defaultSchema : schema);
+                }
+
+                //添加列说明
+                foreach (var property in entityType.GetProperties())
+                {
+                    var columnDescriptionAnnotation = property.FindAnnotation(descriptionAnnotationName);
+
+                    if (columnDescriptionAnnotation != null)
+                    {
+                        migrationBuilder.AddOrUpdateColumnDescription(
+                            tableName,
+                            property.Relational().ColumnName,
+                            columnDescriptionAnnotation.Value.ToString(),
+                            schema.IsNullOrEmpty() ? defaultSchema : schema);
+                    }
+                }
+            }
+
+            return migrationBuilder;
+        }
+        
+        public static bool IsNullOrEmpty(this string s)
+        {
+            return string.IsNullOrEmpty(s);
+        }
+
+        public static bool IsNullOrWhiteSpace(this string s)
+        {
+            return string.IsNullOrWhiteSpace(s);
+        }
+
+        /// <summary>
+        /// type类型是否继承于target_type
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="target_type">目标类型</param>
+        /// <returns></returns>
+        public static bool IsDerivedFrom(this Type type,Type target_type )
+        {
+            if (type.IsGenericType)
+            {
+                Type target_type1 = null;
+                Type type1 = null;
+                if (target_type.GenericTypeArguments.Length == 0)
+                {
+                    if (type.GenericTypeArguments.Length== 0 )
+                    {
+                        target_type1 = target_type.MakeGenericType(typeof(object));
+                    }
+                    else
+                    {
+                        target_type1 = target_type.MakeGenericType(type.GenericTypeArguments);
+                        
+                    }
+                }
+                else
+                {
+                    target_type1 = target_type;
+                }
+
+                if (type.GenericTypeArguments.Length == 0)
+                {
+                    type1 = type.MakeGenericType(typeof(object));
+                }
+                else
+                {
+                    type1 = type;
+                }
+
+                return target_type1.IsAssignableFrom(type1);
+            }
+            else
+            {
+                return target_type.IsAssignableFrom(type);
+            }
+            
+        }
+
+        public static void AddOrUpdateTableDescription(this MigrationBuilder migrationBuilder, string table_name, string description,string schema)
+        {
+            var sql = $@"declare @cou int
+                           select @cou=COUNT(*)  from 
+                           (
+	                        select t.name as tname,c.name as cname, d.value as Description
+                            from sysobjects t
+                            left join syscolumns c
+                            on c.id=t.id and t.xtype='U' and t.name<>'dtproperties'
+                            left join sys.extended_properties d
+                            on c.id=d.major_id and c.colid=d.minor_id and d.name = 'MS_Description'
+                            where t.name = '{table_name}' and d.value is not null
+	                        ) as sdfsdf
+                        if @cou > 0
+	                        EXEC sys.sp_dropextendedproperty    @name=N'MS_Description'    , @level0type=N'SCHEMA'    , @level0name=N'{schema}'    , @level1type=N'TABLE'    , @level1name=N'{table_name}'    , @level2type=N'COLUMN'    , @level2name=N'status'
+                        EXEC sys.sp_addextendedproperty    @name=N'MS_Description'    , @value=N'{description}'    , @level0type=N'SCHEMA'    , @level0name=N'{schema}'    , @level1type=N'TABLE'    , @level1name=N'{table_name}'    , @level2type=N'COLUMN'    , @level2name=N'status'	";
+          var a=  migrationBuilder.Sql(sql);
+           
+        }
+        public static void AddOrUpdateColumnDescription(this MigrationBuilder migrationBuilder, string table_name, string column_name, string description, string schema)
+        {
+            var sql = $@"declare @cou int
+                           select @cou=COUNT(*)  from 
+                           (
+	                        select t.name as tname,c.name as cname, d.value as Description
+                            from sysobjects t
+                            left join syscolumns c
+                            on c.id=t.id and t.xtype='U' and t.name<>'dtproperties'
+                            left join sys.extended_properties d
+                            on c.id=d.major_id and c.colid=d.minor_id and d.name = 'MS_Description'
+                            where t.name = '{table_name}' and c.name = '{column_name}' and d.value is not null
+	                        ) as sdfsdf
+                        if @cou > 0
+	                        EXEC sys.sp_dropextendedproperty    @name=N'MS_Description'    , @level0type=N'SCHEMA'    , @level0name=N'{schema}'    , @level1type=N'TABLE'    , @level1name=N'{table_name}'    , @level2type=N'COLUMN'    , @level2name=N'{column_name}'
+                        EXEC sys.sp_addextendedproperty    @name=N'MS_Description'    , @value=N'{description}'    , @level0type=N'SCHEMA'    , @level0name=N'{schema}'    , @level1type=N'TABLE'    , @level1name=N'{table_name}'    , @level2type=N'COLUMN'    , @level2name=N'{column_name}'	";
+            var a = migrationBuilder.Sql(sql);
+        }
+        
     }
 }

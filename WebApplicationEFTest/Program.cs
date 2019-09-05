@@ -15,6 +15,11 @@ namespace WebApplicationEFTest
     {
         public static void Main(string[] args)
         {
+            bool b = (typeof(int)).IsDerivedFrom(typeof(object));
+            b = (typeof(List<>)).IsDerivedFrom(typeof(IList<>));
+            b = (typeof(List<int>)).IsDerivedFrom(typeof(IList<>));
+            b = (typeof(List<int>)).IsDerivedFrom(typeof(IList<int>));
+            b = (typeof(List<int>)).IsDerivedFrom(typeof(IList<object>));
 
 
             var builder = new ModelBuilder(new Microsoft.EntityFrameworkCore.Metadata.Conventions.ConventionSet());

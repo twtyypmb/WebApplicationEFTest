@@ -10,8 +10,8 @@ using WebApplicationEFTest.Entity;
 namespace WebApplicationEFTest.Migrations
 {
     [DbContext(typeof(TestDBContext))]
-    [Migration("20190904021945_foreignkey-attr")]
-    partial class foreignkeyattr
+    [Migration("20190905083324_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,17 +24,13 @@ namespace WebApplicationEFTest.Migrations
             modelBuilder.Entity("WebApplicationEFTest.Entity.LoginLog", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("LoginTime")
-                        .HasColumnName("login_time");
+                    b.Property<DateTime>("LoginTime");
 
-                    b.Property<DateTime?>("LogoutTime")
-                        .HasColumnName("logout_time");
+                    b.Property<DateTime?>("LogoutTime");
 
-                    b.Property<string>("UserId")
-                        .HasColumnName("user_id");
+                    b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
@@ -46,14 +42,11 @@ namespace WebApplicationEFTest.Migrations
             modelBuilder.Entity("WebApplicationEFTest.Entity.OperateLog", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("UserId1")
-                        .HasColumnName("user_id1");
+                    b.Property<string>("UserId1");
 
-                    b.Property<string>("UserId2")
-                        .HasColumnName("user_id2");
+                    b.Property<string>("UserId2");
 
                     b.HasKey("Id");
 
@@ -67,11 +60,13 @@ namespace WebApplicationEFTest.Migrations
             modelBuilder.Entity("WebApplicationEFTest.Entity.Role", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CardType")
+                        .HasAnnotation("MS_Description", "卡类型 ( 0 : 身份证; 1 : 就诊卡 )");
 
                     b.Property<string>("Name")
-                        .HasColumnName("name");
+                        .HasAnnotation("MS_Description", "姓名");
 
                     b.HasKey("Id");
 
@@ -81,17 +76,13 @@ namespace WebApplicationEFTest.Migrations
             modelBuilder.Entity("WebApplicationEFTest.Entity.User", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<double>("Age")
-                        .HasColumnName("age");
+                    b.Property<double>("Age");
 
-                    b.Property<string>("Name")
-                        .HasColumnName("name");
+                    b.Property<string>("Name");
 
-                    b.Property<int>("Sex")
-                        .HasColumnName("sex");
+                    b.Property<int>("Sex");
 
                     b.HasKey("Id");
 
@@ -101,14 +92,11 @@ namespace WebApplicationEFTest.Migrations
             modelBuilder.Entity("WebApplicationEFTest.Entity.UserExtraInfo", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Address")
-                        .HasColumnName("address");
+                    b.Property<string>("Address");
 
-                    b.Property<string>("UserId")
-                        .HasColumnName("user_id");
+                    b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
@@ -120,17 +108,13 @@ namespace WebApplicationEFTest.Migrations
             modelBuilder.Entity("WebApplicationEFTest.Entity.UserRole", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("RoleId")
-                        .HasColumnName("role_id");
+                    b.Property<string>("RoleId");
 
-                    b.Property<string>("UserIdCurrent")
-                        .HasColumnName("user_id_current");
+                    b.Property<string>("UserIdCurrent");
 
-                    b.Property<string>("UserIdParent")
-                        .HasColumnName("user_id_parent");
+                    b.Property<string>("UserIdParent");
 
                     b.HasKey("Id");
 

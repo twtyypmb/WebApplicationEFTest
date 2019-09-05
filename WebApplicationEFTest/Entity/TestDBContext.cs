@@ -50,38 +50,9 @@ namespace WebApplicationEFTest.Entity
 
         protected override void OnModelCreating(ModelBuilder model_builder)
         {
-            model_builder.GenerateUnderScoreCaseColumn(this);
-            //model_builder.GenerateForeignKey(this);
 
-            //model_builder.Entity<UserRole>()
-            //    .HasOne(p => p.User1)
-            //    .WithMany(p => p.UserRoles1)
-            //    .HasForeignKey(p => p.UserId1)
-            //    .HasConstraintName("ForeignKey_UserRole_User1");
-            //model_builder.Entity<UserRole>()
-            //    .HasOne(p => p.User2)
-            //    .WithMany(p => p.UserRoles2)
-            //    .HasForeignKey(p => p.UserId2)
-            //    .HasConstraintName("ForeignKey_UserRole_User2");
-            //model_builder.Entity<UserRole>()
-            //    .HasOne(p => p.Role)
-            //    .WithMany(p => p.UserRoles)
-            //    .HasForeignKey(p => p.RoleId)
-            //    .HasConstraintName("ForeignKey_UserRole_Role");
-
-
-            //model_builder.Entity<UserRole>()
-            //    .HasOne(p => p.Role)
-            //    .WithMany(p => p.UserRoles)
-            //    .HasForeignKey(p => p.RoleId)
-            //    .HasConstraintName("ForeignKey_UserRole_Role");
-            //model_builder.Entity(typeof(UserRole))
-            //.HasOne(typeof(User)) //不能用string，只能用type https://stackoverflow.com/questions/50366754/entity-type-microsoft-aspnetcore-identity-identityrole-is-in-shadow-state
-            //.WithMany("UserRoles")
-            //.HasForeignKey("UserId")
-            //.HasConstraintName("ForeignKey_UserRole_User");
-
-            base.OnModelCreating(model_builder);
+            model_builder.ConfigDatabaseDescription();
+            base.OnModelCreating(model_builder); 
         }
     }
 }
